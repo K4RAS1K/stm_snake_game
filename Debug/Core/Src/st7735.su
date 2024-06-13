@@ -1,0 +1,9 @@
+../Core/Src/st7735.c:26:6:ST7735_SendByte	16	static
+../Core/Src/st7735.c:36:6:ST7735_WaitLastData	4	static
+../Core/Src/st7735.c:45:6:ST7735_SendCommand	16	static
+../Core/Src/st7735.c:55:6:ST7735_SendData	16	static
+../Core/Src/st7735.c:65:6:ST7735_SendDataMultiple	24	static
+../Core/Src/st7735.c:81:6:ST7735_Init	8	static
+../Core/Src/st7735.c:199:6:ST7735_SetColAddr	24	static
+../Core/Src/st7735.c:215:6:ST7735_SetRowAddr	24	static
+../Core/Src/st7735.c:231:6:ST7735_DrawRect	40	static
