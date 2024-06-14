@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <time.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -64,6 +65,16 @@ extern unsigned short testImage[];
 
 #define MAX_ARRAYS 100 // Максимальное количество массиво
 
+bool flag_move_right = false;
+bool flag_move_left = false;
+bool flag_move_down = false;
+bool flag_move_up = false;
+
+int8_t move_num_x0 = 5;
+int8_t move_num_x1 = 5;
+int8_t move_num_y0 = 0;
+int8_t move_num_y1 = 0;
+
 typedef struct {
     uint8_t x0;
     uint8_t y0;
@@ -83,6 +94,8 @@ for (uint8_t i = 0; i < size; i++) {
 	}
 	return body;
 }
+
+
 /* USER CODE END 0 */
 
 /**
@@ -122,10 +135,10 @@ int main(void)
 
   Snake head;
 
-  head.x0 = 50;
-  head.y0 = 50;
-  head.x1 = 54;
-  head.y1 = 54;
+  head.x0 = 70;
+  head.y0 = 70;
+  head.x1 = 74;
+  head.y1 = 74;
 
   Snake *body = initialize_body();
 
@@ -135,6 +148,10 @@ int main(void)
   after_tail.y0 = 15;
   after_tail.x1 = 15;
   after_tail.y1 = 15;
+
+  int16_t body_size = 2;
+
+  srand(10);
 
   /* USER CODE END 2 */
 
@@ -167,26 +184,66 @@ int main(void)
 	  body[1].x1 = head.x1;
 	  body[1].y1 = head.y1;
 
-	  if (move_num == 0)
-	  {
-		  head.x0 = head.x0 + 5;
-		  head.x1 = head.x1 + 5;
+	  switch (move_num){
+	  	  case 0://move_right
+	  		  if (flag_move_left == false) {
+	  			  move_num_x0 = 5;
+	  			  move_num_x1 = 5;
+	  			  move_num_y0 = 0;
+	  			  move_num_y1 = 0;
+
+	  			  flag_move_right = true;
+	  			  flag_move_left = false;
+	  			  flag_move_down = false;
+	  			  flag_move_up = false;
+	  		  }
+	  		  break;
+	  	  case 1://move_left
+	  		if (flag_move_right == false) {
+	  			move_num_x0 = -5;
+	  			move_num_x1 = -5;
+	  			move_num_y0 = 0;
+	  			move_num_y1 = 0;
+
+	  			flag_move_right = false;
+	  			flag_move_left = true;
+	  			flag_move_down = false;
+	  			flag_move_up = false;
+	  		  }
+	  		  break;
+	  	  case 2://move_down
+	  		if (flag_move_up == false) {
+	  			move_num_x0 = 0;
+	  			move_num_x1 = 0;
+	  			move_num_y0 = 5;
+	  			move_num_y1 = 5;
+
+	  			flag_move_right = false;
+	  			flag_move_left = false;
+	  			flag_move_down = true;
+	  			flag_move_up = false;
+	  		  }
+	  		  break;
+	  	  case 3://move_up
+	  		if (flag_move_down == false) {
+	  			move_num_x0 = 0;
+	  			move_num_x1 = 0;
+	  			move_num_y0 = -5;
+	  			move_num_y1 = -5;
+
+	  			flag_move_right = false;
+	  			flag_move_left = false;
+	  			flag_move_down = false;
+	  			flag_move_up = true;
+	  		  }
+	  		  break;
 	  }
-	  if (move_num == 1)
-	  {
-		  head.x0 = head.x0 - 5;
-		  head.x1 = head.x1 - 5;
-	  }
-	  if (move_num == 2)
-	  {
-		  head.y0 = head.y0 + 5;
-		  head.y1 = head.y1 + 5;
-	  }
-	  if (move_num == 3)
-	  {
-		  head.y0 = head.y0 - 5;
-		  head.y1 = head.y1 - 5;
-	  }
+
+
+	  head.x0 = head.x0 + move_num_x0;
+	  head.x1 = head.x1 + move_num_x1;
+	  head.y0 = head.y0 + move_num_y0;
+	  head.y1 = head.y1 + move_num_y1;
 
 	  HAL_Delay(500);
 
