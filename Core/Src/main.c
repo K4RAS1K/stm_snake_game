@@ -63,7 +63,6 @@ static void MX_SPI1_Init(void);
 /* USER CODE BEGIN 0 */
 extern unsigned short testImage[];
 
-#define MAX_ARRAYS 100 // Максимальное количество массиво
 
 bool flag_move_right = false;
 bool flag_move_left = false;
@@ -149,9 +148,10 @@ int main(void)
   after_tail.x1 = 15;
   after_tail.y1 = 15;
 
-  int16_t body_size = 2;
 
   srand(10);
+
+  uint16_t body_size = 2;
 
   /* USER CODE END 2 */
 
@@ -163,9 +163,12 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 	  ST7735_DrawRect(after_tail.x0, after_tail.y0, after_tail.x1, after_tail.y1, ST7735_COLOR_WHITE);
-	  ST7735_DrawRect(body[0].x0, body[0].y0, body[0].x1, body[0].y1, ST7735_COLOR_GREEN);
-	  ST7735_DrawRect(body[1].x0, body[1].y0, body[1].x1, body[1].y1, ST7735_COLOR_GREEN);
-	  ST7735_DrawRect(head.x0, head.y0, head.x1, head.y1, ST7735_COLOR_RED);
+	  for(uint16_t i = 0; i < body_size; i++)
+	  {
+		  ST7735_DrawRect(body[i].x0, body[i].y0, body[i].x1, body[i].y1, ST7735_COLOR_GREEN);
+	  }
+	  ST7735_DrawRect(head.x0, head.y0, head.x1, head.y1, ST7735_COLOR_BLUE);
+
 	  uint8_t move_num = rand()%4;
 
 	  after_tail.x0 = body[0].x0;
@@ -173,16 +176,19 @@ int main(void)
 	  after_tail.x1 = body[0].x1;
 	  after_tail.y1 = body[0].y1;
 
-	  body[0].x0 = body[1].x0;
-	  body[0].y0 = body[1].y0;
-	  body[0].x1 = body[1].x1;
-	  body[0].y1 = body[1].y1;
+	  for(uint16_t i = 0; i < body_size - 1; i++)
+	  {
+		  body[i].x0 = body[i + 1].x0;
+		  body[i].y0 = body[i + 1].y0;
+		  body[i].x1 = body[i + 1].x1;
+		  body[i].y1 = body[i + 1].y1;
+	  }
 
 
-	  body[1].x0 = head.x0;
-	  body[1].y0 = head.y0;
-	  body[1].x1 = head.x1;
-	  body[1].y1 = head.y1;
+	  body[body_size - 1].x0 = head.x0;
+	  body[body_size - 1].y0 = head.y0;
+	  body[body_size - 1].x1 = head.x1;
+	  body[body_size - 1].y1 = head.y1;
 
 	  switch (move_num){
 	  	  case 0://move_right
