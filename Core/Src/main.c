@@ -81,6 +81,37 @@ typedef struct {
     uint8_t y1;
 } Snake;
 
+uint8_t playground[4] = {6,7,126,127}; //to_change
+
+void game_over(Snake head){
+	if (head.x1 < playground[0] || head.x1 > playground[2])
+	{
+		ST7735_DrawRect(0, 0, 140, 140, ST7735_COLOR_RED);
+		ST7735_DrawRect(20, 20, 60, 120, ST7735_COLOR_BLACK);
+		ST7735_DrawRect(30, 30, 50, 110, ST7735_COLOR_RED);
+		ST7735_DrawRect(30, 30, 60, 50, ST7735_COLOR_RED);
+
+		ST7735_DrawRect(70, 20, 120, 120, ST7735_COLOR_BLACK);
+		ST7735_DrawRect(80, 30, 110, 110, ST7735_COLOR_RED);
+		while (1) {
+			ST7735_DrawRect(30, 30, 50, 50, ST7735_COLOR_RED);
+		}
+	} else if (head.y1 < playground[1] || head.y1 > playground[3]) {
+		ST7735_DrawRect(0, 0, 140, 140, ST7735_COLOR_RED);
+		ST7735_DrawRect(20, 20, 60, 120, ST7735_COLOR_BLACK);
+		ST7735_DrawRect(30, 30, 50, 110, ST7735_COLOR_RED);
+		ST7735_DrawRect(30, 30, 60, 50, ST7735_COLOR_RED);
+
+
+		ST7735_DrawRect(70, 20, 120, 120, ST7735_COLOR_BLACK);
+		ST7735_DrawRect(80, 30, 110, 110, ST7735_COLOR_RED);
+		while (1) {
+			ST7735_DrawRect(30, 30, 50, 50, ST7735_COLOR_RED);
+
+		}
+	}
+}
+
 
 Snake* initialize_body() {
 uint8_t size = 2;
@@ -130,14 +161,16 @@ int main(void)
   /* USER CODE BEGIN 2 */
   ST7735_Init();
 
-  ST7735_DrawRect(0, 0, 140, 140, ST7735_COLOR_WHITE);
+
+  ST7735_DrawRect(0, 0, 140, 140, ST7735_COLOR_BLACK);
+  ST7735_DrawRect(playground[0], playground[1], playground[2],playground[3], ST7735_COLOR_WHITE);
 
   Snake head;
 
-  head.x0 = 70;
-  head.y0 = 70;
-  head.x1 = 74;
-  head.y1 = 74;
+  head.x0 = 72;
+  head.y0 = 72;
+  head.x1 = 76;
+  head.y1 = 76;
 
   Snake *body = initialize_body();
 
@@ -152,6 +185,8 @@ int main(void)
   srand(10);
 
   uint16_t body_size = 2;
+
+
 
   /* USER CODE END 2 */
 
@@ -251,7 +286,9 @@ int main(void)
 	  head.y0 = head.y0 + move_num_y0;
 	  head.y1 = head.y1 + move_num_y1;
 
-	  HAL_Delay(500);
+	  game_over(head);
+
+	  HAL_Delay(100);
 
 
   }
