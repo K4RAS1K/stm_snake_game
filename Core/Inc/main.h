@@ -57,6 +57,14 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define move_up_Pin GPIO_PIN_8
+#define move_up_GPIO_Port GPIOA
+#define move_right_Pin GPIO_PIN_9
+#define move_right_GPIO_Port GPIOA
+#define move_down_Pin GPIO_PIN_10
+#define move_down_GPIO_Port GPIOA
+#define move_left_Pin GPIO_PIN_11
+#define move_left_GPIO_Port GPIOA
 
 /* USER CODE BEGIN Private defines */
 
