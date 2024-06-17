@@ -36,6 +36,10 @@
 #define ReadKey2 HAL_GPIO_ReadPin(GPIOA, move_right_Pin)
 #define ReadKey3 HAL_GPIO_ReadPin(GPIOA, move_down_Pin)
 #define ReadKey4 HAL_GPIO_ReadPin(GPIOA, move_left_Pin)
+
+uint8_t playground[4] = { 7, 7, 126, 126 };
+
+bool apple_flag = false;
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -60,17 +64,6 @@ static void MX_SPI1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-extern unsigned short testImage[];
-
-bool flag_move_right = false;
-bool flag_move_left = false;
-bool flag_move_down = false;
-bool flag_move_up = false;
-
-int8_t move_num_x0 = 5;
-int8_t move_num_x1 = 5;
-int8_t move_num_y0 = 0;
-int8_t move_num_y1 = 0;
 
 typedef struct {
 	uint8_t x0;
@@ -79,10 +72,9 @@ typedef struct {
 	uint8_t y1;
 } Snake;
 
-uint8_t playground[4] = { 7, 7, 126, 126 }; //to_change
-
-void game_over(Snake head) {
+void game_over_wall(Snake head) {
 	if (head.x1 < playground[0] || head.x1 > playground[2]) {
+		HAL_Delay(500);
 		ST7735_DrawRect(0, 0, 140, 140, ST7735_COLOR_RED);
 		ST7735_DrawRect(20, 20, 60, 120, ST7735_COLOR_BLACK);
 		ST7735_DrawRect(30, 30, 50, 110, ST7735_COLOR_RED);
@@ -94,6 +86,7 @@ void game_over(Snake head) {
 			ST7735_DrawRect(30, 30, 50, 50, ST7735_COLOR_RED);
 		}
 	} else if (head.y1 < playground[1] || head.y1 > playground[3]) {
+		HAL_Delay(500);
 		ST7735_DrawRect(0, 0, 140, 140, ST7735_COLOR_RED);
 		ST7735_DrawRect(20, 20, 60, 120, ST7735_COLOR_BLACK);
 		ST7735_DrawRect(30, 30, 50, 110, ST7735_COLOR_RED);
@@ -108,6 +101,24 @@ void game_over(Snake head) {
 	}
 }
 
+void game_over_tail(Snake head, Snake *body, uint16_t body_size) {
+    for (uint16_t i = 0; i < body_size; i++) {
+        if ((head.x0 == body[i].x0 && head.y0 == body[i].y0) || (head.x1 == body[i].x1 && head.y1 == body[i].y1)) {
+            HAL_Delay(500);
+            ST7735_DrawRect(0, 0, 140, 140, ST7735_COLOR_RED);
+            ST7735_DrawRect(20, 20, 60, 120, ST7735_COLOR_BLACK);
+            ST7735_DrawRect(30, 30, 50, 110, ST7735_COLOR_RED);
+            ST7735_DrawRect(30, 30, 60, 50, ST7735_COLOR_RED);
+
+            ST7735_DrawRect(70, 20, 120, 120, ST7735_COLOR_BLACK);
+            ST7735_DrawRect(80, 30, 110, 110, ST7735_COLOR_RED);
+            while (1) {
+                ST7735_DrawRect(30, 30, 50, 50, ST7735_COLOR_RED);
+            }
+        }
+    }
+}
+
 Snake* initialize_body() {
 	uint8_t size = 2;
 	Snake *body = malloc(size * sizeof(Snake));
@@ -118,6 +129,36 @@ Snake* initialize_body() {
 		body[i].y1 = 5 + i;
 	}
 	return body;
+}
+
+Snake* increase_body(Snake *body, uint8_t current_size) {
+	uint8_t new_size = current_size + 1;
+	body = realloc(body, new_size * sizeof(Snake));
+	for (uint8_t i = current_size; i < new_size; i++) {
+		body[i].x0 = body[current_size - 1].x0;
+		body[i].y0 = body[current_size - 1].y0;
+		body[i].x1 = body[current_size - 1].x1;
+		body[i].y1 = body[current_size - 1].y1;
+	}
+	return body;
+}
+
+void spawn_apple(uint8_t apple_cords[4]) {
+	uint8_t apple_x0;
+	uint8_t apple_y0;
+	if (apple_flag == false) {
+		apple_x0 = 7 + 5 * (rand() % 24);
+		do {
+			apple_y0 = 7 + 5 * (rand() % 24);
+		} while (apple_y0 == apple_x0);
+		apple_cords[0] = apple_x0;
+		apple_cords[1] = apple_y0;
+		apple_cords[2] = apple_x0 + 4;
+		apple_cords[3] = apple_y0 + 4;
+		apple_flag = true;
+	}
+	ST7735_DrawRect(apple_cords[0], apple_cords[1], apple_cords[2],
+			apple_cords[3], ST7735_COLOR_RED);
 }
 
 /* USER CODE END 0 */
@@ -152,11 +193,24 @@ int main(void) {
 	MX_GPIO_Init();
 	MX_SPI1_Init();
 	/* USER CODE BEGIN 2 */
+
+	bool flag_move_right = false;
+	bool flag_move_left = false;
+	bool flag_move_down = false;
+	bool flag_move_up = false;
+
+	int8_t move_num_x0 = 5;
+	int8_t move_num_x1 = 5;
+	int8_t move_num_y0 = 0;
+	int8_t move_num_y1 = 0;
+
+	uint8_t apple_cords[4];
+
 	ST7735_Init();
 
 	ST7735_DrawRect(0, 0, 140, 140, ST7735_COLOR_BLACK);
 	ST7735_DrawRect(playground[0], playground[1], playground[2], playground[3],
-			ST7735_COLOR_WHITE);
+	ST7735_COLOR_WHITE);
 
 	Snake head;
 
@@ -173,8 +227,6 @@ int main(void) {
 	after_tail.y0 = 15;
 	after_tail.x1 = 15;
 	after_tail.y1 = 15;
-
-	srand(10);
 
 	uint16_t body_size = 2;
 
@@ -206,6 +258,14 @@ int main(void) {
 
 		if (delay_num == 5) {
 
+			if (head.x0 == apple_cords[0] && head.y0 == apple_cords[1]) {
+				apple_flag = false;
+				body = increase_body(body, body_size);
+				body_size = body_size + 1;
+			}
+
+			spawn_apple(apple_cords);
+
 			ST7735_DrawRect(after_tail.x0, after_tail.y0, after_tail.x1,
 					after_tail.y1, ST7735_COLOR_WHITE);
 			for (uint16_t i = 0; i < body_size; i++) {
@@ -213,9 +273,7 @@ int main(void) {
 				ST7735_COLOR_GREEN);
 			}
 			ST7735_DrawRect(head.x0, head.y0, head.x1, head.y1,
-					ST7735_COLOR_BLUE);
-
-//	  uint8_t move_num = rand()%4;
+			ST7735_COLOR_BLUE);
 
 			after_tail.x0 = body[0].x0;
 			after_tail.y0 = body[0].y0;
@@ -294,7 +352,8 @@ int main(void) {
 			head.y0 = head.y0 + move_num_y0;
 			head.y1 = head.y1 + move_num_y1;
 
-			game_over(head);
+			game_over_wall(head);
+			game_over_tail(head, body, body_size);
 
 			delay_num = 0;
 		}
